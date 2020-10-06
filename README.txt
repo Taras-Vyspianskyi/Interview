@@ -1,4 +1,15 @@
-Connecty to postgesql console:
+endpoint: api/Person/GetAllPeople
+
+params:
+page= int required
+limit= int required
+sortby= Email|FirstName|LastName|Address|PhoneNumber|FaceBookLink|TwitterLink 
+order= Desc|Asc
+HasFaceBookLink= bool 
+
+DB set up
+
+Connect to postgesql console:
 
 create database interview;
 \c interview;
