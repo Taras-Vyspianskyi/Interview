@@ -1,9 +1,13 @@
-﻿using InterviewTask.Common.Entity;
+﻿using InterviewTask.Common.Dto;
+using InterviewTask.Common.Entity;
+using InterviewTask.Common.Enum;
 using InterviewTask.Common.Service;
 using InterviewTask.Common.UnitOfWork;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,18 +22,37 @@ namespace InterviewTask.Services.Service
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Person>> GetAllPeopleAsync()
+        public async Task<GetAllPeopleResponseDto> GetAllPeopleAsync(GetAllPeopleRequestDto requestDto)
         {
             var people = await this.unitOfWork.PersonRepository.GetAllAsync();
 
-            return people;
-        }
+            if (!string.IsNullOrEmpty(requestDto.SortBy) && !string.IsNullOrEmpty(requestDto.Order))
+            {
+                PeopleSortEnum myEnum = (PeopleSortEnum)Enum.Parse(typeof(PeopleSortEnum), requestDto.Order);
 
-        public async Task<IEnumerable<Person>> GetPeopleFilteredAsync(Expression<Func<Person, bool>> predicate)
-        {
-            var filteredPeople = await this.unitOfWork.PersonRepository.FilterByAsync(predicate);
+                if (myEnum > 0)
+                {
+                    var pInfo = typeof(Person).GetProperty(requestDto.SortBy);
 
-            return filteredPeople;
+                    if (pInfo != null)
+                    {
+                        people = myEnum == PeopleSortEnum.Asc ? people.OrderBy(p => pInfo.GetValue(p, null)) : people.OrderByDescending(p => pInfo.GetValue(p, null));
+                    }
+                }
+            }
+
+            if (requestDto.HasFaceBookLink)
+            {
+                people = people.Where(p => p.FaceBookLink != null);
+            }
+
+            people = people.Skip((requestDto.Page - 1) * requestDto.Limit)
+                .Take(requestDto.Limit);
+
+            return new GetAllPeopleResponseDto
+            { 
+                People = people
+            };
         }
     }
 }

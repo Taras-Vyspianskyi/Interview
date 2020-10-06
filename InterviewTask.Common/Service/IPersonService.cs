@@ -1,4 +1,6 @@
-﻿using InterviewTask.Common.Entity;
+﻿using InterviewTask.Common.Dto;
+using InterviewTask.Common.Entity;
+using InterviewTask.Common.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -9,8 +11,6 @@ namespace InterviewTask.Common.Service
 {
     public interface IPersonService
     {
-        Task<IEnumerable<Person>> GetAllPeopleAsync();
-
-        Task<IEnumerable<Person>> GetPeopleFilteredAsync(Expression<Func<Person, bool>> predicate);
+        Task<GetAllPeopleResponseDto> GetAllPeopleAsync(GetAllPeopleRequestDto request);
     }
 }

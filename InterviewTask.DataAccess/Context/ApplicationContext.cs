@@ -10,10 +10,13 @@ namespace InterviewTask.DataAccess.Context
     public class ApplicationContext : DbContext
     {
         #region Constructors        
-        
+
+        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+        {
+        }
+
         public ApplicationContext()
         {
-            Database.EnsureCreated();
         }
 
         #endregion
